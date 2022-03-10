@@ -50,6 +50,9 @@ class TagPhotoContainer extends React.Component {
   };
 
   handleMouseDown = (e) => {
+    if (this.state.selectUser) {
+      return;
+    }
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -67,7 +70,6 @@ class TagPhotoContainer extends React.Component {
       return;
     }
 
-    this.setState({ dragging: false });
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -76,6 +78,7 @@ class TagPhotoContainer extends React.Component {
       endX: x,
       endY: y,
       selectUser: true,
+      dragging: false,
     });
   };
 
@@ -120,6 +123,19 @@ class TagPhotoContainer extends React.Component {
           position: "relative",
         }}
       >
+        {this.state.tags &&
+          this.state.tags.map((tag) => (
+            <Tag
+              {...tag}
+              id={tag._id}
+              startX={this.state.startX}
+              startY={this.state.startY}
+              endX={this.state.endX}
+              endY={this.state.endY}
+              handleRemoveTag={this.handleRemoveTag}
+              fromDB
+            />
+          ))}
         <div
           style={{
             width: 640,
@@ -136,21 +152,9 @@ class TagPhotoContainer extends React.Component {
               startY={this.state.startY}
               endX={this.state.endX}
               endY={this.state.endY}
+              beingCreated
             />
           )}
-          {this.state.tags &&
-            this.state.tags.map((tag) => (
-              <Tag
-                {...tag}
-                id={tag._id}
-                startX={this.state.startX}
-                startY={this.state.startY}
-                endX={this.state.endX}
-                endY={this.state.endY}
-                handleRemoveTag={this.handleRemoveTag}
-                fromDB
-              />
-            ))}
           <img
             key={this.props.photoId}
             draggable={false}

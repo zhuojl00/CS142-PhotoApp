@@ -63,10 +63,6 @@ class TagPhotoContainer extends React.Component {
         {this.props.fromDB && this.state.showName && (
           <div
             style={{ position: "relative", cursor: "pointer", zindex: 99999 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              this.props.handleRemoveTag({ _id: this.props.id });
-            }}
           >
             <div
               style={{
@@ -79,6 +75,10 @@ class TagPhotoContainer extends React.Component {
                 textAlign: "center",
                 border: "1px solid white",
                 borderRadius: "10px",
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                this.props.handleRemoveTag({ _id: this.props.id });
               }}
             >
               x
