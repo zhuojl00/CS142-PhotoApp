@@ -482,3 +482,68 @@ app.post("/photos/new", (request, res) => {
     res.status(200).send("Photo uploaded");
   });
 });
+
+app.get("/photo/:photoId/tags", (request, response) => {
+  const { photoId } = request.params;
+
+  Photo.findOne({ _id: photoId }, (err, photo) => {
+    if (err) {
+      response.status(400).send("Photo not found");
+      return;
+    }
+
+    const tags = photo.tags;
+
+    response.status(200).send(tags);
+  });
+});
+
+app.post("/photo/:photoId/tag/create", (request, response) => {
+  const tagObj = request.body.tag;
+  const id = request.params.photoId;
+  if (!tagObj) {
+    response.status(400).send("No object passed in");
+    return;
+  }
+
+  Photo.findById({ _id: id }, (err, photo) => {
+    if (err) {
+      response.status(400).send("photo not found");
+      return;
+    }
+
+    const newTags = [...photo.tags, tagObj];
+    photo.tags = newTags;
+
+    photo
+      .save()
+      .then((res) => response.status(200).send(res.tags))
+      .catch(() => response.status(500).send("Can't add tag"));
+  });
+});
+
+app.post("/photo/:photoId/tag/remove", (request, response) => {
+  const tagObj = request.body.tag;
+  const id = request.params.photoId;
+  if (!tagObj) {
+    response.status(400).send("No object passed in");
+    return;
+  }
+
+  Photo.findById({ _id: id }, (err, photo) => {
+    if (err) {
+      response.status(400).send("photo not found");
+      return;
+    }
+
+    const newTags = (photo.tags || []).filter(
+      (tag) => tag._id.toString() !== tagObj._id
+    );
+    photo.tags = [...newTags];
+
+    photo
+      .save()
+      .then((res) => response.status(200).send(res.tags))
+      .catch(() => response.status(500).send("Can't remove tag"));
+  });
+});

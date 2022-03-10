@@ -12,7 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import CommentsCard from "./commentsCard.jsx";
 import "./userPhotos.css";
-
+import TagPhotoContainer from "../photoWithTag/TagPhotoContainer";
 /**
  * Define UserPhotos, a React componment of CS142 project #5
  */
@@ -60,13 +60,13 @@ class UserPhotos extends React.Component {
   updateCards = () => {
     axios
       .get(`/getFavoritePhotos`)
-      .then(response => {
-        this.setState({ favoriteIds: response.data.map(photo => photo._id) });
+      .then((response) => {
+        this.setState({ favoriteIds: response.data.map((photo) => photo._id) });
       })
       .catch(() => this.setState({ favoriteIds: [] }));
     axios
       .get(`/photosOfUser/${userId}`)
-      .then(response => {
+      .then((response) => {
         this.setState({ userPhoto: response.data });
       })
       .catch((err) => {
@@ -132,9 +132,10 @@ class UserPhotos extends React.Component {
                   title={`${user.first_name} ${user.last_name}`}
                   subheader={elem.date_time}
                 />
-                <Box textAlign="center">
-                  <img src={`../../images/${elem.file_name}`} />
-                </Box>
+                <TagPhotoContainer
+                  src={`../../images/${elem.file_name}`}
+                  photoId={elem._id}
+                />
                 <CardContent>
                   <Typography component={"div"}>
                     {elem.comments &&

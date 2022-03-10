@@ -54,11 +54,9 @@ class UserList extends React.Component {
               >
                 <ListItemText
                   primary={
-                    (
                     <Typography variant="h6" color="primary">
                       {`${elem.first_name} ${elem.last_name}`}
                     </Typography>
-                    )
                   }
                 />
               </ListItem>
