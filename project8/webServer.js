@@ -408,16 +408,6 @@ app.post("/commentsOfPhoto/:photo_id", function (request, response) {
   });
 });
 
-var server = app.listen(3000, function () {
-  var port = server.address().port;
-  console.log(
-    "Listening at http://localhost:" +
-      port +
-      " exporting the directory " +
-      __dirname
-  );
-});
-
 app.get("/admin/isLoggedIn", function (request, response) {
   if (!request.session.user_id) {
     response.status(200).send(null);
@@ -450,15 +440,10 @@ app.post("/photos/new", (request, res) => {
     //      buffer:        - A node Buffer containing the contents of the file
     //      size:          - The size of the file in bytes
 
-    // XXX - Do some validation here.
-    // We need to create the file in the directory "images" under an unique name. We make
-    // the original file name unique by adding a unique prefix with a timestamp.
     const timestamp = new Date().valueOf();
     const filename = "U" + String(timestamp) + request.file.originalname;
 
     fs.writeFile("./images/" + filename, request.file.buffer, function (err2) {
-      // XXX - Once you have the file written into your images directory under the name
-      // filename you can create the Photo object in the database
       if (err2) {
         res.status(400).send("can't upload photos");
         return;
@@ -546,4 +531,90 @@ app.post("/photo/:photoId/tag/remove", (request, response) => {
       .then((res) => response.status(200).send(res.tags))
       .catch(() => response.status(500).send("Can't remove tag"));
   });
+});
+
+app.get(`/favorites`, function (request, response) {
+  if (!(request.session.login_name && request.session.user_id)) {
+    response.status(400).send("Not logged in :(");
+    return;
+  }
+  const user_id = request.session.user_id;
+  const photoId = request.body.photoId;
+  User.findOne({ _id: user_id }, function (err, user) {
+    if (err) {
+      console.error("Doing /favorites error", err);
+      response.status(400).send(JSON.stringify(err));
+      return;
+    }
+    let currFavorites = user.favorites;
+    let favoritesInfo = [];
+
+    async.each(
+      currFavorites,
+      function (photoId, callbackFavorites) {
+        Photo.findOne({ _id: photoId }, function(err, photo){
+          if (err) {
+            response.status(400).send("photo not found");
+            return;
+          }
+          favoritesInfo.push({
+            file_name: photo.file_name,
+            date_time: photo.date_time,
+            _id: photo._id
+          });
+          callbackFavorites();
+        });
+      },
+    (err1) => {
+      if (err1) {
+        response.status(400).send(JSON.stringify(err1));
+        console.log("were not able to get all favorites")
+      } else {
+        response.status(200).send(favoritesInfo);
+      }
+    });
+  });
+});
+
+app.get(`/addFavorites`, function (request, response) {
+  if (!(request.session.login_name && request.session.user_id)) {
+    response.status(400).send("Not logged in :(");
+    return;
+  }
+  const user_id = request.session.user_id;
+  const photoId = request.body.photoId;
+  User.findOne({ _id: user_id }, function (err, user) {
+    if (err) {
+      console.error("Doing /addFavorites error", err);
+      response.status(400).send(JSON.stringify(err));
+      return;
+    }
+    if (!user) {
+      console.log("User with _id:" + id + " not found.");
+      response.status(400).send("Not found");
+      return;
+    }
+    if (!user.favorites.includes(photoId)) {
+      user.favorites.push(photoId);
+    }
+    User.findOneAndUpdate({_id: user_id}, {favorites: user.favorites},
+      {new: true}, function(error) {
+        if (error) {
+            console.error('Adding favorite photo error: ', error);
+            response.status(400).send(JSON.stringify(error));
+            return;
+        }
+        response.status(200).send('Favorite photo added.');
+    });
+  });
+});
+
+var server = app.listen(3000, function () {
+  var port = server.address().port;
+  console.log(
+    "Listening at http://localhost:" +
+      port +
+      " exporting the directory " +
+      __dirname
+  );
 });

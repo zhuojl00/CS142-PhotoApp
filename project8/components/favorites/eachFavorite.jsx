@@ -1,6 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import Modal from "react-modal";
+// import Modal from "react-modal";
 import axios from "axios";
 import {
     Dialog,
@@ -27,27 +26,26 @@ class EachFavorite extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // array of objects, each with _id, date_time and file_name
       modalOn: false,
     };
   }
   // do i need this?
-  componentDidMount() {
-    Modal.setAppElement("body");
-  }
+  // componentDidMount() {
+  //   Modal.setAppElement("body");
+  // }
 
   getFavorite = () => {
     axios
-      .get(`/getFavoritePhotos`)
+      .get(`/favorites`)
       .then((response) => {
         this.setState({ favorites: response.data });
-        console.log("getFavoritePhotos Completed");
+        console.log("getting favorites Completed");
       })
       .catch(() => this.setState({ favorites: [] }));
   };
 
   unFavorite = (photo) => {
-    let url = `/getFavoritePhotos/${photo._id}`;
+    let url = `/favorites/${photo._id}`;
     axios
       .delete(url) // delete
       .then((response) => {
@@ -67,6 +65,7 @@ class EachFavorite extends React.Component {
   closeModal = () => {
     this.setState({ modalOn: false });
   };
+
   render() {
     return (
       <div>

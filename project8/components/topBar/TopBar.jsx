@@ -11,6 +11,7 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core";
+import { Link } from "react-router-dom";
 import "./TopBar.css";
 import { matchPath, withRouter } from "react-router";
 import axios from "axios";
@@ -65,10 +66,12 @@ class TopBar extends React.Component {
         .post("/photos/new", domForm)
         .then((res) => {
           this.setState({
-            uploadDialog: false
+            uploadDialog: false,
           });
           console.log(res);
-          this.props.history.push(`/photosOfUser/${this.props.current_user._id}`)
+          this.props.history.push(
+            `/photosOfUser/${this.props.current_user._id}`
+          );
         })
         .catch((err) => console.log(`POST ERR: ${err}`));
     }
@@ -86,7 +89,7 @@ class TopBar extends React.Component {
               alignItems="center"
             >
               <Typography variant="h5" color="inherit">
-                Jialin Zhuo
+                JZ-APP
               </Typography>
               <Typography variant="h5" color="inherit">
                 {this.props.current_user.first_name} {this.props.view} Page
@@ -106,7 +109,10 @@ class TopBar extends React.Component {
               >
                 Upload
               </Button>
-              <Dialog open={this.state.uploadDialog} onClose={this.handleDialogClose}>
+              <Dialog
+                open={this.state.uploadDialog}
+                onClose={this.handleDialogClose}
+              >
                 <DialogTitle>Upload A Photo Here</DialogTitle>
                 <DialogContent>
                   <input
@@ -124,6 +130,9 @@ class TopBar extends React.Component {
                   </Button>
                 </DialogContent>
               </Dialog>
+              <Link to="/favorites" style={{ textDecoration: 'none' }}>
+              <Button variant="contained">Favorites</Button>
+              </Link>
               <Button
                 onClick={() => this.props.logOut(this.props.history)}
                 variant="contained"
