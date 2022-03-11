@@ -11,7 +11,6 @@ import {
   IconButton,
   Typography,
 } from "@material-ui/core";
-// import { IconButton } from '@mui/material';
 import { Link } from "react-router-dom";
 import CommentsCard from "./commentsCard.jsx";
 import PhotosCard from "./photoCard.jsx";
@@ -29,9 +28,8 @@ class UserPhotos extends React.Component {
       userPhoto: [],
       userInfo: {},
       userCurrentLocation: 0,
-      favoriteIds: [], // ids of the photos curr user favorited
+      favoriteIds: [], 
     };
-    // this.addComment = this.addComment.bind(this);
   }
 
   componentDidMount() {
@@ -62,6 +60,7 @@ class UserPhotos extends React.Component {
   }
 
   updateCards = () => {
+    let userId = this.props.match.params.userId;
     axios
       .get(`/favorites`)
       .then((response) => {

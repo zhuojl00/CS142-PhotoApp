@@ -22,6 +22,12 @@ class FavoritePhotos extends React.Component {
       .catch(() => this.setState({ favorites: [] }));
   };
 
+  componentDidMount() {
+    this.updateCards();
+  }
+
+
+
   render() {
     return (
       <Grid
@@ -29,15 +35,13 @@ class FavoritePhotos extends React.Component {
         spacing={0}
         direction="row"
         alignItems="center"
-        justifyContent="center"
-        style={{ minHeight: "100vh" }}
       >
         <Grid item xs={12}>
           <Typography variant="h5">Your Favorite Photos</Typography>
         </Grid>
         {this.state.favorites.map((photo) => (
           <Grid item xs={2} key={photo.file_name}>
-            {/* <EachFavorite updateCards={this.updateCards} photo={photo} /> */}
+            <EachFavorite updateCards={this.updateCards} photo={photo} />
           </Grid>
         ))}
       </Grid>

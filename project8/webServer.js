@@ -440,10 +440,15 @@ app.post("/photos/new", (request, res) => {
     //      buffer:        - A node Buffer containing the contents of the file
     //      size:          - The size of the file in bytes
 
+    // XXX - Do some validation here.
+    // We need to create the file in the directory "images" under an unique name. We make
+    // the original file name unique by adding a unique prefix with a timestamp.
     const timestamp = new Date().valueOf();
     const filename = "U" + String(timestamp) + request.file.originalname;
 
     fs.writeFile("./images/" + filename, request.file.buffer, function (err2) {
+      // XXX - Once you have the file written into your images directory under the name
+      // filename you can create the Photo object in the database
       if (err2) {
         res.status(400).send("can't upload photos");
         return;
@@ -520,7 +525,6 @@ app.post("/photo/:photoId/tag/remove", (request, response) => {
       response.status(400).send("photo not found");
       return;
     }
-
     const newTags = (photo.tags || []).filter(
       (tag) => tag._id.toString() !== tagObj._id
     );
@@ -576,13 +580,13 @@ app.get(`/favorites`, function (request, response) {
   });
 });
 
-app.get(`/addFavorites`, function (request, response) {
+app.post(`/addFavorites/:photoId`, function (request, response) {
   if (!(request.session.login_name && request.session.user_id)) {
     response.status(400).send("Not logged in :(");
     return;
   }
   const user_id = request.session.user_id;
-  const photoId = request.body.photoId;
+  const photoId = request.params.photoId;
   User.findOne({ _id: user_id }, function (err, user) {
     if (err) {
       console.error("Doing /addFavorites error", err);
@@ -596,16 +600,18 @@ app.get(`/addFavorites`, function (request, response) {
     }
     if (!user.favorites.includes(photoId)) {
       user.favorites.push(photoId);
+      user.save();
     }
-    User.findOneAndUpdate({_id: user_id}, {favorites: user.favorites},
-      {new: true}, function(error) {
-        if (error) {
-            console.error('Adding favorite photo error: ', error);
-            response.status(400).send(JSON.stringify(error));
-            return;
-        }
-        response.status(200).send('Favorite photo added.');
-    });
+    response.status(200).send('Favorite photo added.');
+    // User.findOneAndUpdate({_id: user_id}, {favorites: user.favorites},
+    //   {new: true}, function(error) {
+    //     if (error) {
+    //         console.error('Adding favorite photo error: ', error);
+    //         response.status(400).send(JSON.stringify(error));
+    //         return;
+    //     }
+    //     response.status(200).send('Favorite photo added.');
+    // });
   });
 });
 

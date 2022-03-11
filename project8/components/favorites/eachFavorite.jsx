@@ -2,14 +2,15 @@ import React from "react";
 // import Modal from "react-modal";
 import axios from "axios";
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    Card,
-    CardMedia,
-    CardHeader,
-    IconButton
+  Box,
+  Dialog,
+  DialogContent,
+  Card,
+  CardMedia,
+  CardHeader,
+  Typography,
 } from "@material-ui/core";
+import {AiOutlineClose} from 'react-icons/ai';
 
 const customStyles = {
   content: {
@@ -68,13 +69,11 @@ class EachFavorite extends React.Component {
 
   render() {
     return (
-      <div>
-        <Card>
+      <Box>
+        <Card >
           <CardHeader
             action={
-              <IconButton onClick={(event) => this.unFavorite(event)}>
-                <Clear />
-              </IconButton>
+              <AiOutlineClose onClick={(event) => this.unFavorite(event)} />
             }
           />
           <CardMedia
@@ -85,19 +84,16 @@ class EachFavorite extends React.Component {
         </Card>
         <Dialog
           onClose={this.closeModal}
-          aria-labelledby="customized-dialog-title"
           open={this.state.modalOn}
         >
-          <DialogTitle id="customized-dialog-title" onClose={this.closeModal}>
-            {this.props.photo.date_time}
-          </DialogTitle>
           <DialogContent>
             <img
               src={`/images/${this.props.photo.file_name}`}
             />
+            <Typography> Posted {this.props.photo.date_time} </Typography>
           </DialogContent>
         </Dialog>
-      </div>
+      </Box>
     );
   }
 }
