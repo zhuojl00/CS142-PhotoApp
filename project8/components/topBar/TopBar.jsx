@@ -61,14 +61,14 @@ class TopBar extends React.Component {
       // Create a DOM form and add the file to it under the name uploadedphoto
       const domForm = new FormData();
       domForm.append("uploadedphoto", this.uploadInput.files[0]);
-
       axios
         .post("/photos/new", domForm)
         .then((res) => {
           this.setState({
             uploadDialog: false
-          })
+          });
           console.log(res);
+          this.props.history.push(`/photosOfUser/${this.props.current_user._id}`)
         })
         .catch((err) => console.log(`POST ERR: ${err}`));
     }
@@ -120,7 +120,7 @@ class TopBar extends React.Component {
                     onClick={this.handleUploadSubmitButtonClicked}
                     variant="contained"
                   >
-                    Upload
+                    Submit Photo
                   </Button>
                 </DialogContent>
               </Dialog>
