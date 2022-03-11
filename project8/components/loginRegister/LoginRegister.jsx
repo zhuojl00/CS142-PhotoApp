@@ -73,6 +73,7 @@ class LoginRegister extends React.Component {
         this.setState({ failedRegister: "" });
         let user = response.data;
         this.props.logIn(user);
+        // new http call
         window.location.href = `#/users/${user._id}`;
       })
       .catch((err) => {

@@ -33,8 +33,6 @@ function doesPasswordMatch(hash, salt, clearTextPassword) {
   let entered_password = salt + clearTextPassword;
   const hash_obj = createHash("sha1", "zuilede");
   const entered_pwd_hash = hash_obj.update(entered_password).digest("hex");
-
-  console.log("ajdsilfjsa", hash, entered_pwd_hash);
   return hash === entered_pwd_hash;
 }
 
