@@ -4,6 +4,9 @@ import {
   Box,
   Button,
   Checkbox,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Grid,
   Toolbar,
   Typography,
@@ -17,24 +20,10 @@ import axios from "axios";
 class TopBar extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      uploadDialog: false,
+    };
   }
-
-  handleUploadButtonClicked = (e) => {
-    e.preventDefault();
-    if (this.uploadInput.files.length > 0) {
-      // Create a DOM form and add the file to it under the name uploadedphoto
-      const domForm = new FormData();
-      domForm.append("uploadedphoto", this.uploadInput.files[0]);
-
-      axios
-        .post("/photos/new", domForm)
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => console.log(`POST ERR: ${err}`));
-    }
-  };
 
   componentDidMount() {
     const path = this.props.history.location.pathname;
@@ -57,6 +46,34 @@ class TopBar extends React.Component {
       }
     }
   }
+
+  handleDialogClickToOpen = () => {
+    this.setState({ uploadDialog: true });
+  };
+
+  handleDialogClose = () => {
+    this.setState({ uploadDialog: false });
+  };
+
+  handleUploadSubmitButtonClicked = (e) => {
+    e.preventDefault();
+    if (this.uploadInput.files.length > 0) {
+      // Create a DOM form and add the file to it under the name uploadedphoto
+      const domForm = new FormData();
+      domForm.append("uploadedphoto", this.uploadInput.files[0]);
+
+      axios
+        .post("/photos/new", domForm)
+        .then((res) => {
+          this.setState({
+            uploadDialog: false
+          })
+          console.log(res);
+        })
+        .catch((err) => console.log(`POST ERR: ${err}`));
+    }
+  };
+
   render() {
     return (
       <AppBar className="cs142-topbar-appBar" position="absolute">
@@ -83,19 +100,30 @@ class TopBar extends React.Component {
                   color="default"
                 />
               </Box>
-              <input
-                type="file"
-                accept="image/*"
-                ref={(domFileRef) => {
-                  this.uploadInput = domFileRef;
-                }}
-              />
               <Button
-                onClick={this.handleUploadButtonClicked}
+                onClick={this.handleDialogClickToOpen}
                 variant="contained"
               >
                 Upload
               </Button>
+              <Dialog open={this.state.uploadDialog} onClose={this.handleDialogClose}>
+                <DialogTitle>Upload A Photo Here</DialogTitle>
+                <DialogContent>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={(domFileRef) => {
+                      this.uploadInput = domFileRef;
+                    }}
+                  />
+                  <Button
+                    onClick={this.handleUploadSubmitButtonClicked}
+                    variant="contained"
+                  >
+                    Upload
+                  </Button>
+                </DialogContent>
+              </Dialog>
               <Button
                 onClick={() => this.props.logOut(this.props.history)}
                 variant="contained"
