@@ -10,12 +10,10 @@ class PhotosCard extends React.Component {
   }
 
   addFavorites = () => {
-    // if already in favorites remove else add to favorites
     axios
       .post(`/addFavorites/${this.props.photoId}`, {})
       .then((response) => {
         this.props.updateCards();
-
         console.log(response.data);
       })
       .catch((error) => {

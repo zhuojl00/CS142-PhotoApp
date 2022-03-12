@@ -7,7 +7,6 @@ class FavoritePhotos extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // array of objects, each with _id, date_time and file_name
       favorites: [],
     };
   }
@@ -25,8 +24,6 @@ class FavoritePhotos extends React.Component {
   componentDidMount() {
     this.updateCards();
   }
-
-
 
   render() {
     return (

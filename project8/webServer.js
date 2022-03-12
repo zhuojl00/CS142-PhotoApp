@@ -295,7 +295,7 @@ app.post("/user", function (request, response) {
       response.status(400).send("User information not valid.");
       return;
     }
-    const { salt_password, hash_password } = await makePasswordEntry(password);
+    const { salt, hash } = await makePasswordEntry(password);
 
     let newUser = {
       first_name: first_name,
@@ -305,8 +305,8 @@ app.post("/user", function (request, response) {
       occupation: occupation,
       login_name: login_name,
       password: password,
-      salt: salt_password,
-      password_digest: hash_password,
+      salt: salt,
+      password_digest: hash,
     };
     User.create(newUser, function (error, user) {
       if (error) {
@@ -389,12 +389,11 @@ app.post("/commentsOfPhoto/:photo_id", function (request, response) {
 
     if (!currComments) {
       photo.comments = [];
-    } else {
-      photo.comments.push({
-        comment: request.body.comment,
-        user_id: request.session.user_id,
-      });
     }
+    photo.comments.push({
+      comment: request.body.comment,
+      user_id: request.session.user_id,
+    });
 
     photo
       .save()
@@ -556,7 +555,7 @@ app.get(`/favorites`, function (request, response) {
     async.each(
       currFavorites,
       function (photoId, callbackFavorites) {
-        Photo.findOne({ _id: photoId }, function(err, photo){
+        Photo.findOne({ _id: photoId }, function (err, photo) {
           if (err) {
             response.status(400).send("photo not found");
             return;
@@ -564,55 +563,72 @@ app.get(`/favorites`, function (request, response) {
           favoritesInfo.push({
             file_name: photo.file_name,
             date_time: photo.date_time,
-            _id: photo._id
+            _id: photo._id,
           });
           callbackFavorites();
         });
       },
-    (err1) => {
-      if (err1) {
-        response.status(400).send(JSON.stringify(err1));
-        console.log("were not able to get all favorites")
-      } else {
-        response.status(200).send(favoritesInfo);
+      (err1) => {
+        if (err1) {
+          response.status(400).send(JSON.stringify(err1));
+          console.log("were not able to get all favorites");
+        } else {
+          response.status(200).send(favoritesInfo);
+        }
       }
-    });
+    );
   });
 });
 
 app.post(`/addFavorites/:photoId`, function (request, response) {
-  if (!(request.session.login_name && request.session.user_id)) {
+  if (request.session.login_name && request.session.user_id) {
+    const user_id = request.session.user_id;
+    const photoId = request.params.photoId;
+    User.findOne({ _id: user_id }, function (err, user) {
+      if (err) {
+        console.error("Doing /addFavorites error", err);
+        response.status(400).send(JSON.stringify(err));
+        return;
+      }
+      if (!user) {
+        console.log("User with _id:" + id + " not found.");
+        response.status(400).send("Not found");
+        return;
+      }
+      if (!user.favorites.includes(photoId)) {
+        user.favorites.push(photoId);
+        user.save();
+      }
+      response.status(200).send("Favorite photo added.");
+    });
+  } else {
     response.status(400).send("Not logged in :(");
-    return;
   }
-  const user_id = request.session.user_id;
-  const photoId = request.params.photoId;
-  User.findOne({ _id: user_id }, function (err, user) {
-    if (err) {
-      console.error("Doing /addFavorites error", err);
-      response.status(400).send(JSON.stringify(err));
-      return;
-    }
-    if (!user) {
-      console.log("User with _id:" + id + " not found.");
-      response.status(400).send("Not found");
-      return;
-    }
-    if (!user.favorites.includes(photoId)) {
-      user.favorites.push(photoId);
+});
+
+app.get(`/deleteFavorites/:photoId`, function (request, response) {
+  if (request.session.login_name && request.session.user_id) {
+    const user_id = request.session.user_id;
+    const photoId = request.params.photoId;
+    User.findOne({ _id: user_id }, function (err, user) {
+      if (err) {
+        console.error("Doing /deleteFavorites error", err);
+        response.status(400).send(JSON.stringify(err));
+        return;
+      }
+      if (!user) {
+        console.log("User with _id:" + id + " not found.");
+        response.status(400).send("Not found");
+        return;
+      }
+      const indexOfPhoto = user.favorites.indexOf(photoId);
+      user.favorites.splice(indexOfPhoto, 1);
       user.save();
-    }
-    response.status(200).send('Favorite photo added.');
-    // User.findOneAndUpdate({_id: user_id}, {favorites: user.favorites},
-    //   {new: true}, function(error) {
-    //     if (error) {
-    //         console.error('Adding favorite photo error: ', error);
-    //         response.status(400).send(JSON.stringify(error));
-    //         return;
-    //     }
-    //     response.status(200).send('Favorite photo added.');
-    // });
-  });
+      response.status(200).send("Favorite photo deleted.");
+    });
+  } else {
+    response.status(400).send("Not logged in :(");
+  }
 });
 
 var server = app.listen(3000, function () {

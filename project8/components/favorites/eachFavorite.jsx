@@ -1,5 +1,4 @@
 import React from "react";
-// import Modal from "react-modal";
 import axios from "axios";
 import {
   Box,
@@ -10,7 +9,7 @@ import {
   CardHeader,
   Typography,
 } from "@material-ui/core";
-import {AiOutlineClose} from 'react-icons/ai';
+import { AiOutlineClose } from "react-icons/ai";
 
 const customStyles = {
   content: {
@@ -30,32 +29,18 @@ class EachFavorite extends React.Component {
       modalOn: false,
     };
   }
-  // do i need this?
-  // componentDidMount() {
-  //   Modal.setAppElement("body");
-  // }
 
-  getFavorite = () => {
+  unFavorite = (event) => {
+    event.preventDefault();
     axios
-      .get(`/favorites`)
-      .then((response) => {
-        this.setState({ favorites: response.data });
-        console.log("getting favorites Completed");
-      })
-      .catch(() => this.setState({ favorites: [] }));
-  };
-
-  unFavorite = (photo) => {
-    let url = `/favorites/${photo._id}`;
-    axios
-      .delete(url) // delete
+      .get(`/deleteFavorites/${this.props.photo._id}`)
       .then((response) => {
         console.log(response.data);
-        this.getFavorites(); //refresh
+        this.props.updateCards(); //refresh
       })
       .catch((error) => {
         alert("Failed to delete photo from favorites");
-        console.log(error.response.data);
+        console.log(error);
       });
   };
 
@@ -70,7 +55,7 @@ class EachFavorite extends React.Component {
   render() {
     return (
       <Box>
-        <Card >
+        <Card>
           <CardHeader
             action={
               <AiOutlineClose onClick={(event) => this.unFavorite(event)} />
@@ -82,12 +67,15 @@ class EachFavorite extends React.Component {
             onClick={this.openModal}
           />
         </Card>
-        <Dialog
-          onClose={this.closeModal}
-          open={this.state.modalOn}
-        >
+        <Dialog onClose={this.closeModal} open={this.state.modalOn}>
           <DialogContent>
+            <Typography color="secondary" variant="subtitle1">
+              {" "}
+              Click anywhere outside of the popup or hit esc key to exit this
+              window :)
+            </Typography>
             <img
+              className="enlarged-image"
               src={`/images/${this.props.photo.file_name}`}
             />
             <Typography> Posted {this.props.photo.date_time} </Typography>
