@@ -213,11 +213,6 @@ app.get("/photosOfUser/:id", function (request, response) {
         response.status(400).send(JSON.stringify(err));
         return;
       }
-      if (photos.length === 0) {
-        console.log("Photos for user with _id:" + id + " not found.");
-        response.status(400).send("Not found");
-        return;
-      }
       photos = JSON.parse(JSON.stringify(photos));
       photos = photos.filter((photo) => photo.permitted_users.includes(request.session.user_id) || photo.permitted_users.length === 0)
 
@@ -334,8 +329,6 @@ app.post("/admin/login", function (request, response) {
       response.status(400).send("login name not found");
       return;
     }
-
-    console.log("aa", user);
     const pwd_match = await doesPasswordMatch(
       user.password_digest,
       user.salt,

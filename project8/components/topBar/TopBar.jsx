@@ -30,6 +30,7 @@ class TopBar extends React.Component {
       uploadDialog: false,
       userVisibility: false,
       selectedUsers: [],
+      showChecklist: false
     };
   }
 
@@ -110,7 +111,7 @@ class TopBar extends React.Component {
           this.setState({
             uploadDialog: false,
             userVisibility: false,
-            selectedUsers: [],
+            selectedUsers: [this.props.current_user._id],
           });
           console.log(res);
           this.props.history.push(
@@ -126,7 +127,6 @@ class TopBar extends React.Component {
   };
 
   handelVisibility = (id) => {
-    console.log(id)
     if (this.state.selectedUsers.includes(id)) {
       // remove the id
       this.setState({selectedUsers: this.state.selectedUsers.filter((_id) => id !== _id)})
@@ -185,12 +185,20 @@ class TopBar extends React.Component {
                   />
                   <br />
                   <List>
-                    <Typography variant="h5">
-                      Specify viewing permission?
-                    </Typography>
+                    <Button variant="contained" onClick={() => {
+                      if (this.state.showChecklist) {
+                        this.setState({selectedUsers: []})
+                      } else {
+                        this.setState({selectedUsers: [this.props.current_user._id]})
+                      }
+
+                      this.setState({showChecklist: !this.state.showChecklist})}
+                      }>
+                      {this.state.showChecklist ? "Close viewing permissions?" : "Select viewing permissions"}
+                    </Button>
                     <br />
-                    {this.state.userList &&
-                      this.state.userList.map((user) => {
+                    {this.state.showChecklist && this.state.userList &&
+                      this.state.userList.filter((user) => user._id !== this.props.current_user._id).map((user) => {
                         const userId = user._id;
                         return (
                           <ListItem
@@ -221,6 +229,7 @@ class TopBar extends React.Component {
                   >
                     Submit Photo
                   </Button>
+                  <br/>
                 </DialogContent>
               </Dialog>
               <Link to="/favorites" style={{ textDecoration: "none" }}>
