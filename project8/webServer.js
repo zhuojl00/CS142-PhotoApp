@@ -215,9 +215,7 @@ app.get("/photosOfUser/:id", function (request, response) {
       }
       photos = JSON.parse(JSON.stringify(photos));
       photos = photos.filter(
-        (photo) =>
-          photo.permitted_users.includes(request.session.user_id) ||
-          photo.permitted_users.length === 0
+        (photo) => photo.permitted_users.includes(request.session.user_id) || photo.permitted_users.length === 0
       );
 
       async.each(
@@ -438,9 +436,7 @@ app.post("/photos/new", (request, res) => {
     // the original file name unique by adding a unique prefix with a timestamp.
     const timestamp = new Date().valueOf();
     const filename = "U" + String(timestamp) + request.file.originalname;
-    const user_id = request.session.user_id;
     let userPermission = JSON.parse(request.body.selectedUsers);
-    console.log("userPermission", userPermission);
     fs.writeFile("./images/" + filename, request.file.buffer, function (err1) {
       // XXX - Once you have the file written into your images directory under the name
       // filename you can create the Photo object in the database
@@ -542,7 +538,6 @@ app.get(`/favorites`, function (request, response) {
     return;
   }
   const user_id = request.session.user_id;
-  const photoId = request.body.photoId;
   User.findOne({ _id: user_id }, function (err, user) {
     if (err) {
       console.error("Doing /favorites error", err);
@@ -555,8 +550,8 @@ app.get(`/favorites`, function (request, response) {
     async.each(
       currFavorites,
       function (photoId, callbackFavorites) {
-        Photo.findOne({ _id: photoId }, function (err, photo) {
-          if (err) {
+        Photo.findOne({ _id: photoId }, function (err1, photo) {
+          if (err1) {
             response.status(400).send("photo not found");
             return;
           }
@@ -568,9 +563,9 @@ app.get(`/favorites`, function (request, response) {
           callbackFavorites();
         });
       },
-      (err1) => {
-        if (err1) {
-          response.status(400).send(JSON.stringify(err1));
+      (err2) => {
+        if (err2) {
+          response.status(400).send(JSON.stringify(err2));
           console.log("were not able to get all favorites");
         } else {
           response.status(200).send(favoritesInfo);
@@ -591,7 +586,7 @@ app.post(`/addFavorites/:photoId`, function (request, response) {
         return;
       }
       if (!user) {
-        console.log("User with _id:" + id + " not found.");
+        console.log("User with _id:" + user_id + " not found.");
         response.status(400).send("Not found");
         return;
       }
@@ -617,7 +612,7 @@ app.get(`/deleteFavorites/:photoId`, function (request, response) {
         return;
       }
       if (!user) {
-        console.log("User with _id:" + id + " not found.");
+        console.log("User with _id:" + user_id + " not found.");
         response.status(400).send("Not found");
         return;
       }

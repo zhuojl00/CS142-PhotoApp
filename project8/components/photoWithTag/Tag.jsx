@@ -1,5 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router";
+import { AiOutlineClose } from 'react-icons/ai';
 
 class TagPhotoContainer extends React.Component {
   constructor(props) {
@@ -61,27 +62,31 @@ class TagPhotoContainer extends React.Component {
       >
         {this.props.fromDB && this.state.showName && (
           <div
-            style={{ position: "relative", cursor: "pointer", zindex: 99999 }}
+            style={{ position: "relative", cursor: "pointer", zindex: 99999,
+            background: "white",}}
           >
             <div
+              role="button"
               style={{
                 position: "absolute",
-                background: "white",
+                backgroundColor: "white",
                 right: 0,
-                top: -15,
+                top: -10,
                 width: 20,
                 height: 20,
-                textAlign: "center",
-                border: "1px solid white",
+                justifyContent: "center",
+                alignContent: "center",
                 borderRadius: "10px",
               }}
-              onClick={(e) => {
-                e.stopPropagation();
-                this.props.handleRemoveTag({ _id: this.props.id });
-              }}
             >
-              x
+              <AiOutlineClose 
+                onClick={(e) => {
+                e.stopPropagation();
+                this.props.handleRemoveTag({ _id: this.props.id })}}
+                > 
+              </AiOutlineClose>
             </div>
+          
             <p
               style={{
                 position: "absolute",

@@ -159,7 +159,8 @@ class PhotoShare extends React.Component {
                           />
                         );
                       }}
-                    ></Route>
+                    >                      
+                    </Route>
                   ) : (
                     <Redirect path="/favorites" to="/login-register" />
                   )}

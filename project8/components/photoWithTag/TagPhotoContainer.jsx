@@ -126,6 +126,7 @@ class TagPhotoContainer extends React.Component {
         {this.state.tags &&
           this.state.tags.map((tag) => (
             <Tag
+              key={tag}
               {...tag}
               id={tag._id}
               startX={this.state.startX}
@@ -137,6 +138,7 @@ class TagPhotoContainer extends React.Component {
             />
           ))}
         <div
+          role="cell"
           style={{
             width: 640,
             height: 480,

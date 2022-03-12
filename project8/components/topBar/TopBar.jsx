@@ -19,7 +19,6 @@ import { Link } from "react-router-dom";
 import "./TopBar.css";
 import { matchPath, withRouter } from "react-router";
 import axios from "axios";
-import color from "@material-ui/core/colors/amber";
 /**
  * Define TopBar, a React componment of CS142 project #5
  */

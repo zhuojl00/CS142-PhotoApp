@@ -29,15 +29,15 @@ class FavoritePhotos extends React.Component {
     return (
       <Grid
         container
-        spacing={0}
+        spacing={8}
         direction="row"
         alignItems="center"
       >
         <Grid item xs={12}>
-          <Typography variant="h5">Your Favorite Photos</Typography>
+          <Typography variant="h3">Your Favorite Photos</Typography>
         </Grid>
         {this.state.favorites.map((photo) => (
-          <Grid item xs={2} key={photo.file_name}>
+          <Grid item xs={3} key={photo.file_name}>
             <EachFavorite updateCards={this.updateCards} photo={photo} />
           </Grid>
         ))}

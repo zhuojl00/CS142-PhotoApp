@@ -26,6 +26,8 @@ class SelectUser extends React.Component {
           this.props.userOptions.map((option) => {
             return (
               <div
+                key={option}
+                role="cell"
                 style={{ cursor: "pointer", background: "white" }}
                 onClick={(e) => {
                   e.stopPropagation();
