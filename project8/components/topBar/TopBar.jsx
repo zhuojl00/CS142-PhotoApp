@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 import "./TopBar.css";
 import { matchPath, withRouter } from "react-router";
 import axios from "axios";
+import color from "@material-ui/core/colors/amber";
 /**
  * Define TopBar, a React componment of CS142 project #5
  */
@@ -30,7 +31,7 @@ class TopBar extends React.Component {
       uploadDialog: false,
       userVisibility: false,
       selectedUsers: [],
-      showChecklist: false
+      showChecklist: false,
     };
   }
 
@@ -96,7 +97,7 @@ class TopBar extends React.Component {
       this.setState({
         selectedUsers: this.state.userList.map(({ _id }) => {
           return { [_id]: true };
-        })
+        }),
       });
     }
     if (this.uploadInput.files.length > 0) {
@@ -107,16 +108,14 @@ class TopBar extends React.Component {
       axios
         .post("/photos/new", domForm)
         .then((res) => {
-          alert("Photo uploaded successfully!")
+          alert("Photo uploaded successfully!");
           this.setState({
             uploadDialog: false,
             userVisibility: false,
             selectedUsers: [this.props.current_user._id],
           });
           console.log(res);
-          this.props.history.push(
-            `/photos/${this.props.current_user._id}`
-          );
+          this.props.history.push(`/photos/${this.props.current_user._id}`);
         })
         .catch((err) => console.log(`POST ERR: ${err}`));
     }
@@ -129,16 +128,18 @@ class TopBar extends React.Component {
   handelVisibility = (id) => {
     if (this.state.selectedUsers.includes(id)) {
       // remove the id
-      this.setState({selectedUsers: this.state.selectedUsers.filter((_id) => id !== _id)})
+      this.setState({
+        selectedUsers: this.state.selectedUsers.filter((_id) => id !== _id),
+      });
     } else {
       // set user id to be checked
-      this.setState({selectedUsers: [...this.state.selectedUsers, id]});
+      this.setState({ selectedUsers: [...this.state.selectedUsers, id] });
     }
   };
 
   render() {
     // console.log("userlist", this.state.userList);
-    console.log("selectedUsers", this.state.selectedUsers)
+    console.log("selectedUsers", this.state.selectedUsers);
     return (
       <AppBar className="cs142-topbar-appBar" position="absolute">
         <Toolbar>
@@ -185,43 +186,52 @@ class TopBar extends React.Component {
                   />
                   <br />
                   <List>
-                    <Button variant="contained" onClick={() => {
-                      if (this.state.showChecklist) {
-                        this.setState({selectedUsers: []})
-                      } else {
-                        this.setState({selectedUsers: [this.props.current_user._id]})
-                      }
-
-                      this.setState({showChecklist: !this.state.showChecklist})}
-                      }>
-                      {this.state.showChecklist ? "Close viewing permissions?" : "Select viewing permissions"}
+                    <Button
+                      color={this.state.showChecklist ? "secondary" : ""}
+                      variant="contained"
+                      onClick={() => {
+                        if (this.state.showChecklist) {
+                          this.setState({ selectedUsers: [] });
+                        } else {
+                          this.setState({
+                            selectedUsers: [this.props.current_user._id],
+                          });
+                        }
+                        this.setState({
+                          showChecklist: !this.state.showChecklist,
+                        });
+                      }}
+                    >
+                      {this.state.showChecklist
+                        ? "Close viewing permissions?"
+                        : "Select viewing permissions"}
                     </Button>
                     <br />
-                    {this.state.showChecklist && this.state.userList &&
-                      this.state.userList.filter((user) => user._id !== this.props.current_user._id).map((user) => {
-                        const userId = user._id;
-                        return (
-                          <ListItem
-                            key={userId}
-                            role={undefined}
-                            // dense
-                            // button
-                          >
-                            <ListItemIcon>
-                              <Checkbox
-                                edge="start"
-                                checked={this.state.selectedUsers[userId]}
-                                onChange={() => this.handelVisibility(userId)}
-                                value={userId}
-                              />
-                              <ListItemText>
-                                {" "}
-                                {user.first_name} {user.last_name}{" "}
-                              </ListItemText>
-                            </ListItemIcon> 
-                          </ListItem>
-                        );
-                      })}
+                    {this.state.showChecklist &&
+                      this.state.userList &&
+                      this.state.userList
+                        .filter(
+                          (user) => user._id !== this.props.current_user._id
+                        )
+                        .map((user) => {
+                          const userId = user._id;
+                          return (
+                            <ListItem key={userId} role={undefined}>
+                              <ListItemIcon>
+                                <Checkbox
+                                  edge="start"
+                                  checked={this.state.selectedUsers[userId]}
+                                  onChange={() => this.handelVisibility(userId)}
+                                  value={userId}
+                                />
+                                <ListItemText>
+                                  {" "}
+                                  {user.first_name} {user.last_name}{" "}
+                                </ListItemText>
+                              </ListItemIcon>
+                            </ListItem>
+                          );
+                        })}
                   </List>
                   <Button
                     onClick={this.handleUploadSubmitButtonClicked}
@@ -229,7 +239,7 @@ class TopBar extends React.Component {
                   >
                     Submit Photo
                   </Button>
-                  <br/>
+                  <br />
                 </DialogContent>
               </Dialog>
               <Link to="/favorites" style={{ textDecoration: "none" }}>

@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { Box, Button, CardActions, IconButton } from "@material-ui/core";
+import { Box, CardActions, IconButton } from "@material-ui/core";
 import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 
 class PhotosCard extends React.Component {
@@ -20,7 +20,7 @@ class PhotosCard extends React.Component {
         console.log(error);
       });
   };
-  
+
   render() {
     return (
       <Box>
@@ -31,7 +31,7 @@ class PhotosCard extends React.Component {
             onClick={this.addFavorites}
           >
             {this.props.alreadyFavorites.includes(this.props.photoId) ? (
-              <BsBookmarkFill />
+              <BsBookmarkFill color="red"/>
             ) : (
               <BsBookmark />
             )}

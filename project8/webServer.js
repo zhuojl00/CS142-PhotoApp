@@ -214,7 +214,11 @@ app.get("/photosOfUser/:id", function (request, response) {
         return;
       }
       photos = JSON.parse(JSON.stringify(photos));
-      photos = photos.filter((photo) => photo.permitted_users.includes(request.session.user_id) || photo.permitted_users.length === 0)
+      photos = photos.filter(
+        (photo) =>
+          photo.permitted_users.includes(request.session.user_id) ||
+          photo.permitted_users.length === 0
+      );
 
       async.each(
         photos,
@@ -436,7 +440,7 @@ app.post("/photos/new", (request, res) => {
     const filename = "U" + String(timestamp) + request.file.originalname;
     const user_id = request.session.user_id;
     let userPermission = JSON.parse(request.body.selectedUsers);
-    console.log("userPermission", userPermission)
+    console.log("userPermission", userPermission);
     fs.writeFile("./images/" + filename, request.file.buffer, function (err1) {
       // XXX - Once you have the file written into your images directory under the name
       // filename you can create the Photo object in the database

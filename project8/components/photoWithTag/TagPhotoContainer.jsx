@@ -100,7 +100,7 @@ class TagPhotoContainer extends React.Component {
     axios
       .post(`/photo/${this.props.photoId}/tag/create`, { tag: tagObj })
       .then((res) => {
-        this.setState((state) => ({ tags: res.data }));
+        this.setState(() => ({ tags: res.data }));
       })
       .catch((err) => console.error(err));
 
@@ -111,7 +111,7 @@ class TagPhotoContainer extends React.Component {
     axios
       .post(`/photo/${this.props.photoId}/tag/remove`, { tag: tag })
       .then((res) => {
-        this.setState((state) => ({ tags: res.data }));
+        this.setState(() => ({ tags: res.data }));
       })
       .catch((err) => console.error(err));
   };
