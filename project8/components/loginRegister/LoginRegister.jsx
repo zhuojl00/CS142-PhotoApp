@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, Typography, TextField } from "@material-ui/core";
+import { Box, Button, Input, Typography, TextField } from "@material-ui/core";
 import "./LoginRegister.css";
 import axios from "axios";
 import { withRouter } from "react-router";
@@ -112,7 +112,7 @@ class LoginRegister extends React.Component {
           <TextField
             required
             fullWidth
-            type="text"
+            type="password"
             label="Password"
             value={this.state.password}
             onChange={(event) => {
@@ -149,7 +149,7 @@ class LoginRegister extends React.Component {
           />
           <TextField
             fullWidth
-            type="text"
+            type="password"
             label="Password"
             value={this.state.registerPassword1 || ""}
             onChange={(event) => {
@@ -160,7 +160,7 @@ class LoginRegister extends React.Component {
           />
           <TextField
             fullWidth
-            type="text"
+            type="password"
             label="Verify Password"
             value={this.state.registerPassword2 || ""}
             onChange={(event) => {

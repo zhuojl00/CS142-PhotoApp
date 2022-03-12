@@ -1,16 +1,15 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import Modal from "react-modal";
 import axios from "axios";
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    Card,
-    CardMedia,
-    CardHeader,
-    IconButton
+  Box,
+  Dialog,
+  DialogContent,
+  Card,
+  CardMedia,
+  CardHeader,
+  Typography,
 } from "@material-ui/core";
+import { AiOutlineClose } from "react-icons/ai";
 
 const customStyles = {
   content: {
@@ -27,36 +26,21 @@ class EachFavorite extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // array of objects, each with _id, date_time and file_name
       modalOn: false,
     };
   }
-  // do i need this?
-  componentDidMount() {
-    Modal.setAppElement("body");
-  }
 
-  getFavorite = () => {
+  unFavorite = (event) => {
+    event.preventDefault();
     axios
-      .get(`/getFavoritePhotos`)
-      .then((response) => {
-        this.setState({ favorites: response.data });
-        console.log("getFavoritePhotos Completed");
-      })
-      .catch(() => this.setState({ favorites: [] }));
-  };
-
-  unFavorite = (photo) => {
-    let url = `/getFavoritePhotos/${photo._id}`;
-    axios
-      .delete(url) // delete
+      .get(`/deleteFavorites/${this.props.photo._id}`)
       .then((response) => {
         console.log(response.data);
-        this.getFavorites(); //refresh
+        this.props.updateCards(); //refresh
       })
       .catch((error) => {
         alert("Failed to delete photo from favorites");
-        console.log(error.response.data);
+        console.log(error);
       });
   };
 
@@ -67,15 +51,14 @@ class EachFavorite extends React.Component {
   closeModal = () => {
     this.setState({ modalOn: false });
   };
+
   render() {
     return (
-      <div>
+      <Box>
         <Card>
           <CardHeader
             action={
-              <IconButton onClick={(event) => this.unFavorite(event)}>
-                <Clear />
-              </IconButton>
+              <AiOutlineClose onClick={(event) => this.unFavorite(event)} />
             }
           />
           <CardMedia
@@ -84,21 +67,21 @@ class EachFavorite extends React.Component {
             onClick={this.openModal}
           />
         </Card>
-        <Dialog
-          onClose={this.closeModal}
-          aria-labelledby="customized-dialog-title"
-          open={this.state.modalOn}
-        >
-          <DialogTitle id="customized-dialog-title" onClose={this.closeModal}>
-            {this.props.photo.date_time}
-          </DialogTitle>
+        <Dialog onClose={this.closeModal} open={this.state.modalOn}>
           <DialogContent>
+            <Typography color="secondary" variant="subtitle1">
+              {" "}
+              Click anywhere outside of the popup or hit esc key to exit this
+              window :)
+            </Typography>
             <img
+              className="enlarged-image"
               src={`/images/${this.props.photo.file_name}`}
             />
+            <Typography> Posted {this.props.photo.date_time} </Typography>
           </DialogContent>
         </Dialog>
-      </div>
+      </Box>
     );
   }
 }

@@ -11,6 +11,7 @@ import TopBar from "./components/topBar/TopBar";
 import UserDetail from "./components/userDetail/userDetail";
 import UserList from "./components/userList/userList";
 import UserPhotos from "./components/userPhotos/userPhotos";
+import FavoritePhotos from "./components/favorites/favoritePhotos";
 import LoginRegister from "./components/loginRegister/LoginRegister";
 
 class PhotoShare extends React.Component {
@@ -147,6 +148,20 @@ class PhotoShare extends React.Component {
                     />
                   ) : (
                     <Redirect path="/users/:userId" to="/login-register" />
+                  )}
+                  {this.state.current_user ? (
+                    <Route
+                      path="/favorites"
+                      render={(props) => {
+                        return (
+                          <FavoritePhotos
+                            {...props}
+                          />
+                        );
+                      }}
+                    ></Route>
+                  ) : (
+                    <Redirect path="/favorites" to="/login-register" />
                   )}
                   {this.state.current_user ? (
                     <Route path="/users" component={UserList} />

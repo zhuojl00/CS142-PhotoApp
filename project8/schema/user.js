@@ -16,6 +16,7 @@ var userSchema = new mongoose.Schema({
   occupation: String, // Occupation of the user.
   password_digest: String,
   salt: String,
+  favorites: [String],
 });
 
 // the schema is useless so far

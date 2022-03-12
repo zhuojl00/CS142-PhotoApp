@@ -4,13 +4,16 @@ import {
   Box,
   Button,
   Card,
+  CardActions,
   CardHeader,
   CardContent,
   Grid,
+  IconButton,
   Typography,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import CommentsCard from "./commentsCard.jsx";
+import PhotosCard from "./photoCard.jsx";
 import "./userPhotos.css";
 import TagPhotoContainer from "../photoWithTag/TagPhotoContainer";
 /**
@@ -25,9 +28,8 @@ class UserPhotos extends React.Component {
       userPhoto: [],
       userInfo: {},
       userCurrentLocation: 0,
-      favoriteIds: [], // ids of the photos curr user favorited
+      favoriteIds: [], 
     };
-    // this.addComment = this.addComment.bind(this);
   }
 
   componentDidMount() {
@@ -58,8 +60,9 @@ class UserPhotos extends React.Component {
   }
 
   updateCards = () => {
+    let userId = this.props.match.params.userId;
     axios
-      .get(`/getFavoritePhotos`)
+      .get(`/favorites`)
       .then((response) => {
         this.setState({ favoriteIds: response.data.map((photo) => photo._id) });
       })
@@ -135,6 +138,11 @@ class UserPhotos extends React.Component {
                 <TagPhotoContainer
                   src={`../../images/${elem.file_name}`}
                   photoId={elem._id}
+                />
+                <PhotosCard
+                  photoId={elem._id}
+                  updateCards={this.updateCards}
+                  alreadyFavorites={this.state.favoriteIds}
                 />
                 <CardContent>
                   <Typography component={"div"}>
