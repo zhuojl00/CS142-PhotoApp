@@ -11,17 +11,6 @@ import {
 } from "@material-ui/core";
 import { AiOutlineClose } from "react-icons/ai";
 
-const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-  },
-};
-
 class EachFavorite extends React.Component {
   constructor(props) {
     super(props);
