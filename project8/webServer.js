@@ -143,10 +143,7 @@ app.get("/test/:p1", function (request, response) {
  * URL /user/list - Return all the User object.
  */
 app.get("/user/list", function (request, response) {
-  console.log("session", request.session);
   if (request.session.login_name && request.session.user_id) {
-    console.log(request.session.login_name);
-    console.log(request.session.user_id);
     User.find({}, function (err, users) {
       if (err) {
         console.error("Doing /user/list error:", err);
@@ -216,12 +213,9 @@ app.get("/photosOfUser/:id", function (request, response) {
         response.status(400).send(JSON.stringify(err));
         return;
       }
-      if (photos.length === 0) {
-        console.log("Photos for user with _id:" + id + " not found.");
-        response.status(400).send("Not found");
-        return;
-      }
       photos = JSON.parse(JSON.stringify(photos));
+      photos = photos.filter((photo) => photo.permitted_users.includes(request.session.user_id) || photo.permitted_users.length === 0)
+
       async.each(
         photos,
         function (currPhoto, callbackPhoto) {
@@ -230,7 +224,6 @@ app.get("/photosOfUser/:id", function (request, response) {
             function (currComment, callbackComment) {
               let comment_id = currComment.user_id;
               delete currComment.user_id;
-              console.log(comment_id);
               User.findOne({ _id: comment_id }, "first_name last_name _id")
                 .then((user) => {
                   currComment.user = user;
@@ -336,8 +329,6 @@ app.post("/admin/login", function (request, response) {
       response.status(400).send("login name not found");
       return;
     }
-
-    console.log("aa", user);
     const pwd_match = await doesPasswordMatch(
       user.password_digest,
       user.salt,
@@ -431,7 +422,6 @@ app.post("/photos/new", (request, res) => {
     if (err || !request.file) {
       res.status(400).send(err);
     }
-
     // request.file has the following properties of interest
     //      fieldname      - Should be 'uploadedphoto' since that is what we sent
     //      originalname:  - The name of the file the user uploaded
@@ -444,11 +434,14 @@ app.post("/photos/new", (request, res) => {
     // the original file name unique by adding a unique prefix with a timestamp.
     const timestamp = new Date().valueOf();
     const filename = "U" + String(timestamp) + request.file.originalname;
-
-    fs.writeFile("./images/" + filename, request.file.buffer, function (err2) {
+    const user_id = request.session.user_id;
+    let userPermission = JSON.parse(request.body.selectedUsers);
+    console.log("userPermission", userPermission)
+    fs.writeFile("./images/" + filename, request.file.buffer, function (err1) {
       // XXX - Once you have the file written into your images directory under the name
       // filename you can create the Photo object in the database
-      if (err2) {
+      if (err1) {
+        console.log(err1);
         res.status(400).send("can't upload photos");
         return;
       }
@@ -456,13 +449,16 @@ app.post("/photos/new", (request, res) => {
       Photo.create(
         {
           file_name: filename,
+          date_time: timestamp,
           user_id: request.session.user_id,
           comments: [],
+          tags: [],
+          permitted_users: userPermission,
         },
-        function (err3) {
-          if (err3) {
+        function (err2) {
+          if (err2) {
             res.status(500).send("create failed");
-            return err3;
+            return err2;
           }
           return null;
         }

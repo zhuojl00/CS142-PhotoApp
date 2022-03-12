@@ -8,6 +8,10 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   Toolbar,
   Typography,
 } from "@material-ui/core";
@@ -22,7 +26,11 @@ class TopBar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      userList: [],
       uploadDialog: false,
+      userVisibility: false,
+      selectedUsers: [],
+      showChecklist: false
     };
   }
 
@@ -46,8 +54,34 @@ class TopBar extends React.Component {
         this.props.changeView("Photos");
       }
     }
+    axios
+      .get(`/user/list`)
+      .then((response) => {
+        console.log(response.data);
+        this.setState({ userList: response.data });
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.current_user !== this.props.current_user) {
+      axios
+        .get(`/user/list`)
+        .then((response) => {
+          console.log(response.data);
+          this.setState({
+            userList: response.data,
+            userVisibility: false,
+            selectedUsers: [],
+          });
+        })
+        .catch((err) => {
+          console.log(err.response);
+        });
+    }
+  }
   handleDialogClickToOpen = () => {
     this.setState({ uploadDialog: true });
   };
@@ -58,26 +92,53 @@ class TopBar extends React.Component {
 
   handleUploadSubmitButtonClicked = (e) => {
     e.preventDefault();
+    if (!this.state.userVisibility) {
+      this.setState({
+        selectedUsers: this.state.userList.map(({ _id }) => {
+          return { [_id]: true };
+        })
+      });
+    }
     if (this.uploadInput.files.length > 0) {
       // Create a DOM form and add the file to it under the name uploadedphoto
       const domForm = new FormData();
       domForm.append("uploadedphoto", this.uploadInput.files[0]);
+      domForm.append("selectedUsers", JSON.stringify(this.state.selectedUsers));
       axios
         .post("/photos/new", domForm)
         .then((res) => {
+          alert("Photo uploaded successfully!")
           this.setState({
             uploadDialog: false,
+            userVisibility: false,
+            selectedUsers: [this.props.current_user._id],
           });
           console.log(res);
           this.props.history.push(
-            `/photosOfUser/${this.props.current_user._id}`
+            `/photos/${this.props.current_user._id}`
           );
         })
         .catch((err) => console.log(`POST ERR: ${err}`));
     }
   };
 
+  turnOnSelectedVisibility = () => {
+    this.setState({ userVisibility: !this.state.userVisibility });
+  };
+
+  handelVisibility = (id) => {
+    if (this.state.selectedUsers.includes(id)) {
+      // remove the id
+      this.setState({selectedUsers: this.state.selectedUsers.filter((_id) => id !== _id)})
+    } else {
+      // set user id to be checked
+      this.setState({selectedUsers: [...this.state.selectedUsers, id]});
+    }
+  };
+
   render() {
+    // console.log("userlist", this.state.userList);
+    console.log("selectedUsers", this.state.selectedUsers)
     return (
       <AppBar className="cs142-topbar-appBar" position="absolute">
         <Toolbar>
@@ -122,16 +183,57 @@ class TopBar extends React.Component {
                       this.uploadInput = domFileRef;
                     }}
                   />
+                  <br />
+                  <List>
+                    <Button variant="contained" onClick={() => {
+                      if (this.state.showChecklist) {
+                        this.setState({selectedUsers: []})
+                      } else {
+                        this.setState({selectedUsers: [this.props.current_user._id]})
+                      }
+
+                      this.setState({showChecklist: !this.state.showChecklist})}
+                      }>
+                      {this.state.showChecklist ? "Close viewing permissions?" : "Select viewing permissions"}
+                    </Button>
+                    <br />
+                    {this.state.showChecklist && this.state.userList &&
+                      this.state.userList.filter((user) => user._id !== this.props.current_user._id).map((user) => {
+                        const userId = user._id;
+                        return (
+                          <ListItem
+                            key={userId}
+                            role={undefined}
+                            // dense
+                            // button
+                          >
+                            <ListItemIcon>
+                              <Checkbox
+                                edge="start"
+                                checked={this.state.selectedUsers[userId]}
+                                onChange={() => this.handelVisibility(userId)}
+                                value={userId}
+                              />
+                              <ListItemText>
+                                {" "}
+                                {user.first_name} {user.last_name}{" "}
+                              </ListItemText>
+                            </ListItemIcon> 
+                          </ListItem>
+                        );
+                      })}
+                  </List>
                   <Button
                     onClick={this.handleUploadSubmitButtonClicked}
                     variant="contained"
                   >
                     Submit Photo
                   </Button>
+                  <br/>
                 </DialogContent>
               </Dialog>
-              <Link to="/favorites" style={{ textDecoration: 'none' }}>
-              <Button variant="contained">Favorites</Button>
+              <Link to="/favorites" style={{ textDecoration: "none" }}>
+                <Button variant="contained">Favorites</Button>
               </Link>
               <Button
                 onClick={() => this.props.logOut(this.props.history)}

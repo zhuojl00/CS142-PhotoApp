@@ -19,30 +19,8 @@ class PhotosCard extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-    // if (this.props.alreadyFavorites.includes(this.props.photoId)) {
-    //   axios
-    //     .delete(`/addFavorites/${this.props.photoId}`, {})
-    //     .then((response) => {
-    //       this.props.updateCards();
-
-    //       console.log(response.data);
-    //     })
-    //     .catch((error) => {
-    //       console.log(error.response.data);
-    //     });
-    // } else {
-    //   axios
-    //     .post(`/addFavorites/${this.props.photoId}`, {})
-    //     .then((response) => {
-    //       this.props.updateCards();
-
-    //       console.log(response.data);
-    //     })
-    //     .catch((error) => {
-    //       console.log(error.response.data);
-    //     });
-    // }
   };
+  
   render() {
     return (
       <Box>
