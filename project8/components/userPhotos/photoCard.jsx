@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { Box, Button, CardActions, IconButton } from "@material-ui/core";
-import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
+import { BsBookmark, BsBookmarkFill, BsHeart, BsHeartFill } from "react-icons/bs";
 
 class PhotosCard extends React.Component {
   constructor(props) {
@@ -19,30 +19,8 @@ class PhotosCard extends React.Component {
       .catch((error) => {
         console.log(error);
       });
-    // if (this.props.alreadyFavorites.includes(this.props.photoId)) {
-    //   axios
-    //     .delete(`/addFavorites/${this.props.photoId}`, {})
-    //     .then((response) => {
-    //       this.props.updateCards();
-
-    //       console.log(response.data);
-    //     })
-    //     .catch((error) => {
-    //       console.log(error.response.data);
-    //     });
-    // } else {
-    //   axios
-    //     .post(`/addFavorites/${this.props.photoId}`, {})
-    //     .then((response) => {
-    //       this.props.updateCards();
-
-    //       console.log(response.data);
-    //     })
-    //     .catch((error) => {
-    //       console.log(error.response.data);
-    //     });
-    // }
   };
+
   render() {
     return (
       <Box>
@@ -53,9 +31,20 @@ class PhotosCard extends React.Component {
             onClick={this.addFavorites}
           >
             {this.props.alreadyFavorites.includes(this.props.photoId) ? (
-              <BsBookmarkFill />
+              <BsBookmarkFill style={{ background: "primary" }}/>
             ) : (
               <BsBookmark />
+            )}
+          </IconButton>
+          <IconButton
+            placeholder="like"
+            title="like"
+            onClick={this.addFavorites}
+          >
+            {this.props.alreadyFavorites.includes(this.props.photoId) ? (
+              <BsHeartFill style={{ background: "primary" }}/>
+            ) : (
+              <BsHeart />
             )}
           </IconButton>
         </CardActions>
